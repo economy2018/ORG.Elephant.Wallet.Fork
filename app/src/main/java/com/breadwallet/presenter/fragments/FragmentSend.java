@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.breadwallet.BreadApp;
 import com.breadwallet.BuildConfig;
 import com.breadwallet.R;
+import com.breadwallet.presenter.activities.WalletActivity;
 import com.breadwallet.presenter.customviews.BRButton;
 import com.breadwallet.presenter.customviews.BRDialogView;
 import com.breadwallet.presenter.customviews.BRKeyboard;
@@ -36,10 +37,10 @@ import com.breadwallet.presenter.customviews.BaseTextView;
 import com.breadwallet.presenter.entities.CryptoRequest;
 import com.breadwallet.presenter.fragments.utils.ModalDialogFragment;
 import com.breadwallet.presenter.viewmodels.SendViewModel;
-import com.breadwallet.tools.animation.UiUtils;
 import com.breadwallet.tools.animation.BRDialog;
 import com.breadwallet.tools.animation.SlideDetector;
 import com.breadwallet.tools.animation.SpringAnimator;
+import com.breadwallet.tools.animation.UiUtils;
 import com.breadwallet.tools.manager.BRClipboardManager;
 import com.breadwallet.tools.manager.BRReportsManager;
 import com.breadwallet.tools.manager.BRSharedPrefs;
@@ -50,10 +51,9 @@ import com.breadwallet.tools.util.CurrencyUtils;
 import com.breadwallet.tools.util.StringUtil;
 import com.breadwallet.tools.util.Utils;
 import com.breadwallet.wallet.WalletsMaster;
-import com.breadwallet.wallet.util.CryptoUriParser;
 import com.breadwallet.wallet.abstracts.BaseWalletManager;
+import com.breadwallet.wallet.util.CryptoUriParser;
 import com.breadwallet.wallet.wallets.bitcoin.BaseBitcoinWalletManager;
-import com.breadwallet.wallet.wallets.ela.WalletElaManager;
 import com.breadwallet.wallet.wallets.ethereum.WalletEthManager;
 
 import java.math.BigDecimal;
@@ -119,6 +119,8 @@ public class FragmentSend extends ModalDialogFragment implements BRKeyboard.OnIn
     private SendViewModel mViewModel;
     private ViewGroup mBackgroundLayout;
     private ViewGroup mSignalLayout;
+
+    public static boolean mFromRedPackage = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -620,7 +622,7 @@ public class FragmentSend extends ModalDialogFragment implements BRKeyboard.OnIn
     }
 
     private void showKeyboard(boolean b) {
-        if (!b) {
+        if (!b || mFromRedPackage) {
             mSignalLayout.removeView(mKeyboardLayout);
 
         } else {
@@ -704,12 +706,27 @@ public class FragmentSend extends ModalDialogFragment implements BRKeyboard.OnIn
     public void onResume() {
         super.onResume();
         loadViewModelData();
+        Log.i("xidaokun", "mFromRedPackage:"+mFromRedPackage);
+        mAmountEdit.setEnabled(!mFromRedPackage);
+        mAddressEdit.setEnabled(!mFromRedPackage);
+        mCommentEdit.setEnabled(!mFromRedPackage);
+        mScan.setClickable(!mFromRedPackage);
+        mPaste.setClickable(!mFromRedPackage);
+        mCurrencyCodeButton.setClickable(!mFromRedPackage);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Utils.hideKeyboard(getActivity());
+        mAmountEdit.setEnabled(true);
+        mAddressEdit.setEnabled(true);
+        mCommentEdit.setEnabled(true);
+        mScan.setClickable(true);
+        mPaste.setClickable(true);
+        mCurrencyCodeButton.setClickable(true);
+        mFromRedPackage = false;
+        WalletActivity.mCallbackUrl = null;
     }
 
     private void handleClick(String key) {
