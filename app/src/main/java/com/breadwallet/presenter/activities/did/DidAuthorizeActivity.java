@@ -47,6 +47,8 @@ public class DidAuthorizeActivity extends BaseSettingsActivity {
 
     private Button mAuthorizeBtn;
 
+    private BaseTextView mAppNameTv;
+
     private CheckBox mAuthorCbox;
 
     private BaseTextView mWillTv;
@@ -81,6 +83,8 @@ public class DidAuthorizeActivity extends BaseSettingsActivity {
                 mUri = intent.getStringExtra(Constants.INTENT_EXTRA_KEY.META_EXTRA);
             }
         }
+//        mUri = "elaphant://identity?CallbackUrl=http%3A%2F%2Fdevsite.matrixyz.cn%2Fb.php%3Fidww%3D1&ReturnUrl=http%3A%2F%2Fdevsite.matrixyz.cn%2Fa.php%3Fida%3D1&Description=developerSite&AppID=223311&PublicKey=0290985E607823C7C8E1559588C5A07D62D2A0073EF042AE86EFDDCBA9687958D6&Signature=6E6ABE5B8733D8AEA09C6D813A50BF5DE7AF9E70446467CADE62FFB3D8AE5EF7013F01AC8232893701DA676D2EB13C992830025EE8BC1F35F7A75EF4C94A2B72&DID=ifjPYkMBfxFUes8DETpzRoM76bkVXg9DXv&RandomNumber=1548641817&AppName=developerSitaees";
+
         initView();
         initListener();
 
@@ -91,11 +95,14 @@ public class DidAuthorizeActivity extends BaseSettingsActivity {
         uriFactory = new UriFactory();
         uriFactory.parse(mUri);
 
+        mAppNameTv.setText(uriFactory.getAppName());
         mWillTv.setText(String.format(getString(R.string.Did_Will_Get), uriFactory.getAppName()));
+        mAuthorCbox.setText(String.format(getString(R.string.Author_Auto_Check), uriFactory.getAppName()));
 
         Log.i("xidaokun", "did:"+uriFactory.getDID());
         boolean isAuto = BRSharedPrefs.isAuthorAuto(this, uriFactory.getDID());
         mAuthorCbox.setButtonDrawable(isAuto?R.drawable.ic_author_check:R.drawable.ic_author_uncheck);
+
         if(isAuto) author();
     }
 
@@ -115,6 +122,7 @@ public class DidAuthorizeActivity extends BaseSettingsActivity {
     }
 
     private void initView(){
+        mAppNameTv = findViewById(R.id.app_name);
         mNickNameSb = findViewById(R.id.nickname_switch_btn);
         mAddressSb = findViewById(R.id.receive_switch_btn);
         mDenyBtn = findViewById(R.id.deny_btn);
@@ -192,7 +200,7 @@ public class DidAuthorizeActivity extends BaseSettingsActivity {
                     @Override
                     public void run() {
                         String ret = DidDataSource.getInstance(DidAuthorizeActivity.this).callBackUrl(backurl, entity);
-                        if(!StringUtil.isNullOrEmpty(ret)) {
+                        if(ret != null) {
                             if(ret.contains("err code:")) {
                                 Toast.makeText(DidAuthorizeActivity.this, ret, Toast.LENGTH_SHORT).show();
                                 mLoadingDialog.dismiss();

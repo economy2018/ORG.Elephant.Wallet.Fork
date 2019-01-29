@@ -1768,7 +1768,7 @@ static struct BREthereumTokenRecord tokens[] = {
         1
     },
     {
-        "0x0000000000000000000000000000000000000",
+        "0x2bba3cf6de6058cc1b4457ce00deb359e2703d7d",
         "IOEX",
         "Coming soon",
         "",

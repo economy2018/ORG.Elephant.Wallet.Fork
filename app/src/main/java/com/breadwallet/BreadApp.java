@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.breadwallet.cache.UpgradeHandler;
 import com.breadwallet.presenter.activities.util.ApplicationLifecycleObserver;
 import com.breadwallet.presenter.activities.util.BRActivity;
 import com.breadwallet.tools.crypto.Base32;
@@ -170,7 +171,8 @@ public class BreadApp extends Application {
         int oldVerson = BRSharedPrefs.getVersionCode(this, "version");
         if(oldVerson != newVersion){
             BRSharedPrefs.putCachedBalance(this, "ELA",  new BigDecimal(0));
-            ElaDataSource.getInstance(this).deleteAllTransactions();
+            UpgradeHandler.getInstance(this).deleteAllTransactions();
+            UpgradeHandler.getInstance(this).deleteAllKVs();
             BRSharedPrefs.putVersionCode(this, "version", newVersion);
         }
 
